@@ -44,7 +44,7 @@
     letter-spacing: 3px;
   }
   #header p {
-    font-size: 11px;
+    font-size: 13px;
     color: #6272a4;
     margin-top: 3px;
     letter-spacing: 1px;
@@ -71,7 +71,7 @@
     pointer-events: auto;
   }
   #panel-name {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
     color: #f1fa8c;
     margin-bottom: 10px;
@@ -82,15 +82,15 @@
     gap: 6px;
   }
   .tag {
-    font-size: 11px;
-    padding: 3px 9px;
+    font-size: 13px;
+    padding: 4px 11px;
     border-radius: 6px;
     border: 1px solid;
     white-space: nowrap;
   }
   #panel-stats {
     margin-top: 9px;
-    font-size: 11px;
+    font-size: 13px;
     color: #6272a4;
     letter-spacing: 1px;
   }
@@ -102,10 +102,10 @@
     background: rgba(13,11,26,.85);
     border: 1px solid rgba(139,233,253,.4);
     color: #8be9fd;
-    padding: 7px 14px;
+    padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 15px;
     font-family: inherit;
     z-index: 30;
     transition: background .2s;
@@ -114,13 +114,13 @@
   #search {
     position: fixed;
     top: 118px; left: 16px;
-    width: 132px;
+    width: 158px;
     background: rgba(13,11,26,.85);
     border: 1px solid rgba(189,147,249,.4);
     color: #f8f8f2;
-    padding: 7px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 14px;
     font-family: inherit;
     z-index: 30;
     outline: none;
@@ -134,10 +134,10 @@
     background: rgba(13,11,26,.85);
     border: 1px solid rgba(189,147,249,.4);
     color: #bd93f9;
-    padding: 7px 14px;
+    padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 15px;
     font-family: inherit;
     z-index: 30;
     display: none;
@@ -156,9 +156,9 @@
     z-index: 20;
     pointer-events: none;
   }
-  .leg { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; color: #6272a4; }
+  .leg { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; color: #8892b8; }
   .leg:last-child { margin-bottom: 0; }
-  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .leg-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .leg-dash {
     width: 22px; height: 0;
     border-top: 2px dashed;
@@ -169,12 +169,18 @@
   #hint {
     position: fixed;
     bottom: 18px; right: 16px;
-    font-size: 11px;
-    color: #44475a;
-    text-align: right;
+    background: rgba(13,11,26,.85);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #9ba3c9;
+    text-align: left;
     pointer-events: none;
-    line-height: 1.9;
+    line-height: 2.1;
+    z-index: 20;
   }
+  #hint b { color: #d6dbf5; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -208,10 +214,10 @@
 </div>
 
 <div id="hint">
-  點擊角色查看關係<br>
-  拖曳角色可調整位置<br>
-  點擊空白返回總覽<br>
-  滾輪 / 雙指縮放
+  🖱️ <b>點擊角色</b>｜查看關係<br>
+  ✋ <b>拖曳角色</b>｜調整位置<br>
+  🌌 <b>點擊空白</b>｜返回總覽<br>
+  🔍 <b>滾輪 / 雙指</b>｜縮放畫面
 </div>
 
 <script>
@@ -261,6 +267,8 @@ const NODES = [
   { id:'騰騰',      label:'騰騰',      color:'#6272a4', size:20, group:'other'      },
   { id:'電特',      label:'電特',      color:'#8be9fd', size:20, group:'friend'     },
 ];
+// 全體頭像放大倍率
+NODES.forEach(n => { n.size = Math.round(n.size * 1.25); });
 
 // type: parent | alliance | staff | partner | romantic | friend | other
 const EDGES = [
@@ -555,7 +563,7 @@ function applyTreeLayout() {
   const bandH = Math.min(124, rowStep - 26);  // 色帶高度 < 排距，保證不重疊
 
   // 世代標尺資料（含每排範圍與代表色，供長條背景使用）
-  const GEN_LABELS = { '-0.4':'推し', '0':'本家・同輩', '0.5':'管家幕僚', '1':'子嗣', '2':'孫輩' };
+  const GEN_LABELS = { '-0.4':'神壇', '0':'本家・同輩', '0.5':'管家幕僚', '1':'子嗣', '2':'孫輩' };
   const GEN_COLORS = ['#ffb86c', '#ff79c6', '#f1fa8c', '#50fa7b', '#bd93f9', '#8be9fd'];
   genRows = [];
 
@@ -784,7 +792,7 @@ let genRows = [];
 function drawGenRuler() {
   if (layoutMode!=='tree' || mode!=='overview') return;
   ctx.save();
-  ctx.font = '11px "Noto Sans TC",sans-serif';
+  ctx.font = '14px "Noto Sans TC",sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   genRows.forEach(g=>{
@@ -800,7 +808,7 @@ function drawGenRuler() {
     ctx.stroke();
     // 世代標籤（帶內側左上角）
     ctx.fillStyle = g.color + 'aa';
-    ctx.fillText(g.label, bx + 14, by + 16);
+    ctx.fillText(g.label, bx + 14, by + 18);
   });
   ctx.restore();
 }
@@ -906,8 +914,8 @@ function drawEdgeLabels() {
     const color = ECOLOR[e.type] || '#6272a4';
     // 有方向性的關係：聚焦來源端時改用 labelFrom
     const lbl = (e.s === focused.id && e.labelFrom) ? e.labelFrom : e.label;
-    ctx.font = '11px "Noto Sans TC", sans-serif';
-    const tw = ctx.measureText(lbl).width + 12;
+    ctx.font = '13px "Noto Sans TC", sans-serif';
+    const tw = ctx.measureText(lbl).width + 14;
 
     // 候選位置：沿線不同比例，優先沿用上一幀
     let fracs = [.5, .42, .58, .34, .66, .27, .73];
@@ -916,14 +924,14 @@ function drawEdgeLabels() {
     let chosen = null, chosenFrac = .5;
     for (const f of fracs) {
       const mx = a.x + (b.x-a.x)*f, my = a.y + (b.y-a.y)*f;
-      const rc = { x: mx-tw/2, y: my-9, w: tw, h: 18 };
+      const rc = { x: mx-tw/2, y: my-11, w: tw, h: 22 };
       let bad = placedRects.some(p => rectsOverlap(p, rc));
       if (!bad) bad = NODES.some(m => circleRectOverlap(m.x, m.y, m.size*(m.sclCur||1)+4, rc));
       if (!bad) { chosen = rc; chosenFrac = f; break; }
     }
     if (!chosen) {
       const mx = a.x + (b.x-a.x)*.5, my = a.y + (b.y-a.y)*.5;
-      chosen = { x: mx-tw/2, y: my-9, w: tw, h: 18 };
+      chosen = { x: mx-tw/2, y: my-11, w: tw, h: 22 };
       chosenFrac = .5;
     }
     e.lfrac = chosenFrac;
@@ -1056,7 +1064,7 @@ function drawLabels() {
     const isHovered  = hovered && hovered.id===n.id;
     const scl = n.sclCur == null ? 1 : n.sclCur;
     const r   = n.size * scl;
-    const fs  = Math.max(9.5, r*.44);
+    const fs  = Math.max(13, r*.46);
 
     ctx.font = `${fs}px "Noto Sans TC",sans-serif`;
     const w = ctx.measureText(n.label).width;

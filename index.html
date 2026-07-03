@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>P水世家宗親會 · Peimily</title>
+<meta name="description" content="P水世家宗親會 · Peimily 人物關係表">
+<meta property="og:title" content="P水世家宗親會 · Peimily">
+<meta property="og:description" content="與他們的關係戶 · 互動人物關係表">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://peisuky.github.io/peimily-family-tree/">
+<meta property="og:image" content="https://peisuky.github.io/peimily-family-tree/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="P水世家宗親會 · Peimily">
+<meta name="twitter:description" content="與他們的關係戶 · 互動人物關係表">
+<meta name="twitter:image" content="https://peisuky.github.io/peimily-family-tree/og-image.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -266,6 +278,7 @@ const NODES = [
   { id:'嗷嗷',      label:'嗷嗷',      color:'#6272a4', size:20, group:'other'      },
   { id:'騰騰',      label:'騰騰',      color:'#6272a4', size:20, group:'other'      },
   { id:'電特',      label:'電特',      color:'#8be9fd', size:20, group:'friend'     },
+  { id:'Kulas',     label:'Kulas',     color:'#f1fa8c', size:20, group:'staff'      },
 ];
 // 全體頭像放大倍率
 NODES.forEach(n => { n.size = Math.round(n.size * 1.25); });
@@ -286,7 +299,7 @@ const EDGES = [
   { s:'KB',       t:'艾修',      label:'三子',        type:'parent'   },
   // Peisuky children
   { s:'Peisuky',  t:'澤仔',      label:'長子',        type:'parent'   },
-  { s:'澤仔',     t:'傑德',      label:'寶',          type:'other'    },
+  { s:'澤仔',     t:'傑德',      label:'寶',          type:'romantic' },
   { s:'Peisuky',  t:'傑瑞',      label:'次子',        type:'parent'   },
   { s:'Peisuky',  t:'南瓜派',    label:'三子',        type:'parent'   },
   { s:'Peisuky',  t:'洛瓦洛',    label:'四子',        type:'parent'   },
@@ -324,6 +337,7 @@ const EDGES = [
   { s:'騰騰',     t:'犬神子夜',  label:'爸爸',        type:'parent'   },
   { s:'Peisuky',  t:'偷肉將',    label:'右聲道',      type:'friend'   },
   { s:'Peisuky',  t:'電特',      label:'左聲道',      type:'friend'   },
+  { s:'Peisuky',  t:'Kulas',     label:'保鑣',        type:'staff'    },
 ];
 
 // edge type → color
@@ -381,6 +395,7 @@ const IMG_MAP = {
   '納納熊':   '納納熊.png',
   '騰騰':     '騰騰.png',
   '電特':     '電特.png',
+  'Kulas':    'Kulas.png',
 };
 const nodeImgs = {};
 Object.entries(IMG_MAP).forEach(([id, file]) => {
@@ -626,7 +641,7 @@ function applyTreeLayout() {
     if (d === 0.5) {
       const peiX = nodeMap['Peisuky'] ? nodeMap['Peisuky'].ox : W / 2;
       const gap = 140;
-      const STAFF_X = { '阿泉': peiX - gap*3, '動特': peiX - gap*2, '米角': peiX - gap, 'サトシ': peiX + gap, '多多': peiX + gap*2, 'Ivan': peiX + gap*3 };
+      const STAFF_X = { 'Kulas': peiX - gap*4, '阿泉': peiX - gap*3, '動特': peiX - gap*2, '米角': peiX - gap, 'サトシ': peiX + gap, '多多': peiX + gap*2, 'Ivan': peiX + gap*3 };
       ordered.forEach(n => {
         if (STAFF_X[n.id] != null) { n.ox = STAFF_X[n.id]; n._tx = n.ox; }
       });
@@ -1349,6 +1364,7 @@ searchEl.addEventListener('change', () => {
 }
 
 frame();
+// sync
 </script>
 </body>
 </html>

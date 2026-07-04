@@ -193,6 +193,38 @@
     z-index: 20;
   }
   #hint b { color: #d6dbf5; font-weight: 700; }
+
+  /* ── Mobile ──────────────────────────────────── */
+  @media (max-width: 640px) {
+    /* 資訊面板：限制高度、關係標籤區可捲動，避免蓋住星圖/族譜 */
+    #panel {
+      bottom: 12px;
+      max-height: 34vh;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px 10px;
+    }
+    #panel-name { font-size: 18px; margin-bottom: 8px; flex-shrink: 0; }
+    #panel-rels {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      flex: 1;
+      min-height: 0;
+      gap: 5px;
+    }
+    .tag { font-size: 12px; padding: 3px 9px; }
+    #panel-stats { font-size: 11px; margin-top: 7px; flex-shrink: 0; }
+
+    /* 操作說明手機上收掉、圖例縮小 */
+    #hint { display: none; }
+    #legend { padding: 8px 10px; top: 66px; right: 10px; }
+    .leg { font-size: 11px; gap: 6px; margin-bottom: 4px; }
+    .leg-dot { width: 10px; height: 10px; }
+
+    #btn-layout { top: 66px; font-size: 13px; padding: 7px 12px; }
+    #search { top: 108px; font-size: 13px; width: 138px; }
+    #btn-back { top: 150px; font-size: 13px; padding: 7px 12px; }
+  }
 </style>
 </head>
 <body>
@@ -685,7 +717,9 @@ function setFocus(node) {
   mode = 'focus';
   addRipple(node);
 
-  const fw = W/2, fh = H/2;
+  // 手機：面板佔據下方，聚焦中心往上移
+  const isMobile = W <= 640;
+  const fw = W/2, fh = isMobile ? H*0.36 : H/2;
   node.tx = fw; node.ty = fh;
 
   // Unique neighbors

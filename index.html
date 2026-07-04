@@ -311,6 +311,7 @@ const NODES = [
   { id:'騰騰',      label:'騰騰',      color:'#6272a4', size:20, group:'other'      },
   { id:'電特',      label:'電特',      color:'#8be9fd', size:20, group:'friend'     },
   { id:'Kulas',     label:'Kulas',     color:'#f1fa8c', size:20, group:'staff'      },
+  { id:'芝麻',      label:'芝麻',      color:'#ff6e6e', size:18, group:'partner'    },
 ];
 // 全體頭像放大倍率
 NODES.forEach(n => { n.size = Math.round(n.size * 1.25); });
@@ -347,6 +348,7 @@ const EDGES = [
   { s:'八熊',     t:'納納熊',    label:'交往',        type:'romantic' },
   { s:'泡沫奶綠', t:'邦邦',      label:'交往',        type:'romantic' },
   { s:'超扯扯',   t:'湯麵',      label:'交往',        type:'romantic' },
+  { s:'阿胖胖',   t:'芝麻',      label:'伴伴',        type:'romantic' },
   // Grandchildren → directly to Peisuky
   { s:'Peisuky',  t:'超扯扯',    label:'孫子',        type:'parent'   },
   { s:'Peisuky',  t:'朝日熊',    label:'孫子',        type:'parent'   },
@@ -370,6 +372,9 @@ const EDGES = [
   { s:'Peisuky',  t:'偷肉將',    label:'右聲道',      type:'friend'   },
   { s:'Peisuky',  t:'電特',      label:'左聲道',      type:'friend'   },
   { s:'Peisuky',  t:'Kulas',     label:'保鑣',        type:'staff'    },
+  { s:'犬神子夜', t:'KB',        label:'老公',        type:'romantic' },
+  { s:'犬神子夜', t:'米角',      label:'前夫',        type:'romantic' },
+  { s:'騰騰',     t:'9P',        label:'兒子',        type:'parent'   },
 ];
 
 // edge type → color
@@ -428,6 +433,7 @@ const IMG_MAP = {
   '騰騰':     '騰騰.png',
   '電特':     '電特.png',
   'Kulas':    'Kulas.png',
+  '芝麻':     '芝麻.png',
 };
 const nodeImgs = {};
 Object.entries(IMG_MAP).forEach(([id, file]) => {
@@ -599,6 +605,7 @@ function applyTreeLayout() {
   depth['阿泉'] = 0.5;  // 阿泉歸入管家幕僚層
   depth['嗷嗷'] = 0;    // 孫輩的爸爸，排在本家同輩層
   depth['騰騰'] = 0;
+  depth['9P'] = 0;      // 雖是騰騰兒子，仍留在本家同輩層
   depth['阿亂'] = -0.4;
 
   const rows = {};

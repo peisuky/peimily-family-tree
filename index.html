@@ -321,30 +321,35 @@ const NODES = [
 NODES.forEach(n => { n.size = Math.round(n.size * 1.25); });
 
 // type: parent | alliance | staff | partner | romantic | friend | other
+// 方向性標籤規則：
+//   label     = 連線上顯示的預設文字
+//   labelFrom = 從 s（來源）端看 t 的說法（顯示在 s 的面板：labelFrom：t）
+//   labelTo   = 從 t（目標）端看 s 的說法（顯示在 t 的面板：labelTo：s）
+// 對稱關係（同盟、交往、夥伴等）不需要 labelFrom / labelTo
 const EDGES = [
   { s:'KB',       t:'Peisuky',   label:'雄臭同盟',    type:'alliance' },
   { s:'Peisuky',  t:'9P',        label:'PP同盟',      type:'alliance' },
   // KB / Peisuky 是阿亂的狂粉（labelFrom = 從狂粉這端看的說法）
   { s:'KB',       t:'阿亂',      label:'厄介狂粉',    labelFrom:'推し', type:'alliance' },
   { s:'Peisuky',  t:'阿亂',      label:'厄介狂粉',    labelFrom:'推し', type:'alliance' },
-  { s:'Peisuky',  t:'米角',      label:'管家',        type:'staff'    },
+  { s:'Peisuky',  t:'米角',      label:'管家',        labelTo:'主人',   type:'staff'    },
   { s:'米角',     t:'動特',      label:'伴侶',        type:'romantic' },
-  { s:'Peisuky',  t:'サトシ',    label:'實習管家',    type:'staff'    },
+  { s:'Peisuky',  t:'サトシ',    label:'實習管家',    labelTo:'主人',   type:'staff'    },
   // KB children
-  { s:'KB',       t:'L.T.',      label:'長子',        type:'parent'   },
-  { s:'KB',       t:'南瓜派',    label:'次子',        type:'parent'   },
-  { s:'KB',       t:'艾修',      label:'三子',        type:'parent'   },
+  { s:'KB',       t:'L.T.',      label:'長子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'KB',       t:'南瓜派',    label:'次子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'KB',       t:'艾修',      label:'三子',        labelTo:'爸爸',   type:'parent'   },
   // Peisuky children
-  { s:'Peisuky',  t:'澤仔',      label:'長子',        type:'parent'   },
+  { s:'Peisuky',  t:'澤仔',      label:'長子',        labelTo:'爸爸',   type:'parent'   },
   { s:'澤仔',     t:'傑德',      label:'寶',          type:'romantic' },
-  { s:'Peisuky',  t:'傑瑞',      label:'次子',        type:'parent'   },
-  { s:'Peisuky',  t:'南瓜派',    label:'三子',        type:'parent'   },
-  { s:'Peisuky',  t:'洛瓦洛',    label:'四子',        type:'parent'   },
-  { s:'Peisuky',  t:'鹿米',      label:'養子',        type:'parent'   },
+  { s:'Peisuky',  t:'傑瑞',      label:'次子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'Peisuky',  t:'南瓜派',    label:'三子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'Peisuky',  t:'洛瓦洛',    label:'四子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'Peisuky',  t:'鹿米',      label:'養子',        labelTo:'養父',   type:'parent'   },
   // 澤仔 children
-  { s:'澤仔',     t:'嘎逼',      label:'長子',        type:'parent'   },
-  { s:'澤仔',     t:'八熊',      label:'次子',        type:'parent'   },
-  { s:'澤仔',     t:'泡沫奶綠',  label:'乾兒子',      type:'parent'   },
+  { s:'澤仔',     t:'嘎逼',      label:'長子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'澤仔',     t:'八熊',      label:'次子',        labelTo:'爸爸',   type:'parent'   },
+  { s:'澤仔',     t:'泡沫奶綠',  label:'乾兒子',      labelTo:'乾爹',   type:'parent'   },
   // 傑瑞 relations
   { s:'傑瑞',     t:'二宮零水',  label:'名義老公',    type:'romantic' },
   { s:'傑瑞',     t:'朗文',      label:'互訂契約',    type:'romantic' },
@@ -355,32 +360,32 @@ const EDGES = [
   { s:'超扯扯',   t:'湯麵',      label:'交往',        type:'romantic' },
   { s:'阿胖胖',   t:'芝麻',      label:'伴伴',        type:'romantic' },
   // Grandchildren → directly to Peisuky
-  { s:'Peisuky',  t:'八熊',      label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'超扯扯',    label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'朝日熊',    label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'湯麵',      label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'獸王谷加',      label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'阿胖胖',    label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'犬神子夜',  label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'柴虎',      label:'孫子',        type:'parent'   },
-  { s:'Peisuky',  t:'汪歐',      label:'孫子',        type:'parent'   },
+  { s:'Peisuky',  t:'八熊',      label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'超扯扯',    label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'朝日熊',    label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'湯麵',      label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'獸王谷加',  label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'阿胖胖',    label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'犬神子夜',  label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'柴虎',      label:'孫子',        labelTo:'爺爺',   type:'parent'   },
+  { s:'Peisuky',  t:'汪歐',      label:'孫子',        labelTo:'爺爺',   type:'parent'   },
   { s:'Peisuky',  t:'香酥雞',    label:'酥雞兄弟',    type:'alliance' },
   // 香酥雞 branch
-  { s:'香酥雞',   t:'嘎逼',      label:'乾爹',        type:'other'    },
-  { s:'香酥雞',   t:'勝海',      label:'子',          type:'parent'   },
+  { s:'香酥雞',   t:'嘎逼',      label:'乾爹',        labelFrom:'乾兒子', type:'other'  },
+  { s:'香酥雞',   t:'勝海',      label:'子',          labelTo:'爸爸',   type:'parent'   },
   // Friends
   { s:'Peisuky',  t:'阿泉',      label:'遊戲好夥伴',  type:'friend'   },
-  { s:'Peisuky',  t:'多多',      label:'Peimily坐墊', type:'friend'   },
-  { s:'多多',     t:'Ivan',      label:'公',          type:'romantic' },
-  { s:'嗷嗷',     t:'八熊',      label:'爸爸',        type:'parent'   },
-  { s:'嗷嗷',     t:'超扯扯',    label:'爸爸',        type:'parent'   },
-  { s:'騰騰',     t:'犬神子夜',  label:'爸爸',        type:'parent'   },
-  { s:'Peisuky',  t:'偷肉將',    label:'右聲道',      type:'friend'   },
-  { s:'Peisuky',  t:'電特',      label:'左聲道',      type:'friend'   },
-  { s:'Peisuky',  t:'Kulas',     label:'保鑣',        type:'staff'    },
+  { s:'Peisuky',  t:'多多',      label:'Peimily坐墊', labelTo:'坐墊使用者', type:'friend' },
+  { s:'多多',     t:'Ivan',      label:'公',          labelTo:'伴侶',   type:'romantic' },
+  { s:'嗷嗷',     t:'八熊',      label:'爸爸',        labelFrom:'兒子', type:'parent'   },
+  { s:'嗷嗷',     t:'超扯扯',    label:'爸爸',        labelFrom:'兒子', type:'parent'   },
+  { s:'騰騰',     t:'犬神子夜',  label:'爸爸',        labelFrom:'兒子', type:'parent'   },
+  { s:'Peisuky',  t:'偷肉將',    label:'右聲道',      labelTo:'配戴者', type:'friend'   },
+  { s:'Peisuky',  t:'電特',      label:'左聲道',      labelTo:'配戴者', type:'friend'   },
+  { s:'Peisuky',  t:'Kulas',     label:'保鑣',        labelTo:'雇主',   type:'staff'    },
   { s:'犬神子夜', t:'KB',        label:'老公',        type:'romantic' },
   { s:'犬神子夜', t:'米角',      label:'前夫',        type:'romantic' },
-  { s:'騰騰',     t:'9P',        label:'兒子',        type:'parent'   },
+  { s:'騰騰',     t:'9P',        label:'爸爸',        labelFrom:'兒子', type:'parent'   },
 ];
 
 // edge type → color
@@ -788,8 +793,11 @@ function updatePanel(node) {
   const seen = new Set();
   const items = [];
   node.adj.forEach(a => {
-    // 有方向性的關係：從來源端看用 labelFrom（例：Peisuky 看阿亂是「推し」）
-    const lbl = (a.edge.s === node.id && a.edge.labelFrom) ? a.edge.labelFrom : a.edge.label;
+    // 有方向性的關係：從來源端看用 labelFrom、從目標端看用 labelTo
+    // （例：騰騰→犬神子夜「爸爸」，騰騰面板顯示 labelFrom「兒子」）
+    const lbl = (a.edge.s === node.id)
+      ? (a.edge.labelFrom || a.edge.label)
+      : (a.edge.labelTo   || a.edge.label);
     const key = a.peer.id + '|' + lbl;
     if (seen.has(key)) return;
     seen.add(key);
@@ -975,8 +983,8 @@ function drawEdgeLabels() {
 
     const a = e.sn, b = e.tn;
     const color = ECOLOR[e.type] || '#6272a4';
-    // 有方向性的關係：聚焦來源端時改用 labelFrom
-    const lbl = (e.s === focused.id && e.labelFrom) ? e.labelFrom : e.label;
+    // 有方向性的關係：聚焦來源端用 labelFrom、聚焦目標端用 labelTo
+    const lbl = (e.s === focused.id) ? (e.labelFrom || e.label) : (e.labelTo || e.label);
     ctx.font = '13px "Noto Sans TC", sans-serif';
     const tw = ctx.measureText(lbl).width + 14;
 

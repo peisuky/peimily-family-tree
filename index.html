@@ -478,7 +478,15 @@ window.addEventListener('resize', () => {
     applyTreeLayout();
     if (mode === 'overview') NODES.forEach(n => { n.tx = n.ox; n.ty = n.oy; });
   } else if (mode === 'overview') {
-    storeOverview();
+    // 視窗改變時重算星圖同心圓，從舊位置平滑移動過去
+    const old = NODES.map(n => [n.x, n.y]);
+    computeStarLayout();
+    separateCircles();
+    NODES.forEach((n, i) => {
+      n.gx = n.x; n.gy = n.y; n.ox = n.x; n.oy = n.y;
+      n.tx = n.x; n.ty = n.y;
+      n.x = old[i][0]; n.y = old[i][1];
+    });
   }
 });
 
@@ -1482,28 +1490,81 @@ canvas.addEventListener('touchend', e => {
 // INIT
 // ═══════════════════════════════════════════════════════
 
-// Seed positions by group before simulation
-const GROUP_POS = {
-  main:       {x:  0, y:-80},
-  staff:      {x:220, y:-120},
-  child:      {x: 40, y:160},
-  grandchild: {x: 80, y:350},
-  partner:    {x:280, y:220},
-  friend:     {x:-300, y:80},
-  other:      {x:-220, y:200},
-};
+// 星圖佈局：以 Peisuky 為中心的同心圓
+// 每一圈 = 與 Peisuky 的關係距離（hop），同圈的人沿圓周平均散開
+// 外圈的人對齊自己內圈親屬的方位，關係線不會亂繞
+function computeStarLayout() {
+  const scx = W/2, scy = H/2;
+  const pei = nodeMap['Peisuky'];
+  pei.x = scx; pei.y = scy;
 
-NODES.forEach((n,i) => {
-  const gp = GROUP_POS[n.group] || {x:0,y:0};
-  const angle = (i*2.39996) % (Math.PI*2);
-  const r = 40+Math.random()*70;
-  n.x = W/2 + gp.x + Math.cos(angle)*r;
-  n.y = H/2 + gp.y + Math.sin(angle)*r;
-  n.vx=0; n.vy=0;
-});
+  const rings = {};
+  NODES.forEach(n => { if (n.hop > 0) (rings[n.hop] = rings[n.hop] || []).push(n); });
+  const hops = Object.keys(rings).map(Number).sort((a, b) => a - b);
 
-runSim(600);
-separateCircles();   // 星圖：保證圓框不互相重疊
+  // 直接關係（hop 1）拆成三個小圈：子嗣+幕僚最內、同盟朋友居中、孫輩在外
+  const SUBRING = { child:0, staff:0, partner:1, alliance:1, other:1, friend:1, grandchild:2 };
+  const GROUP_ORDER = { child:0, staff:1, partner:2, alliance:3, other:4, friend:5, grandchild:6 };
+
+  const ringList = [];
+  hops.forEach(h => {
+    if (h === 1) {
+      const subs = [[], [], []];
+      rings[1].forEach(n => subs[SUBRING[n.group] ?? 1].push(n));
+      subs.forEach(s => { if (s.length) ringList.push({ members: s, anchored: false }); });
+    } else {
+      ringList.push({ members: rings[h], anchored: true });
+    }
+  });
+
+  let prevR = 0, prevMax = pei.size;
+  ringList.forEach((ring, ri) => {
+    const ms = ring.members;
+    const maxSize = Math.max(...ms.map(n => n.size));
+    // 半徑：最內圈貼近 Peisuky；其餘 = 內圈半徑 + 兩圈節點半徑 + 邊距
+    // 同時保證圓周塞得下所有人
+    const need = ms.reduce((s, n) => s + n.size*2 + 26, 0) / (Math.PI*2);
+    const base = ri === 0
+      ? pei.size + maxSize + 60
+      : prevR + prevMax + maxSize + 36;
+    const R = Math.max(base, need);
+    prevR = R; prevMax = maxSize;
+
+    if (!ring.anchored) {
+      ms.sort((a, b) =>
+        ((GROUP_ORDER[a.group] ?? 9) - (GROUP_ORDER[b.group] ?? 9)) || a.id.localeCompare(b.id));
+      // 每圈起始角度錯開，避免人排成放射狀直線
+      const start = -Math.PI/2 + ri * 0.4;
+      ms.forEach((n, i) => { n._ang = start + (i / ms.length) * Math.PI*2; });
+    } else {
+      // 錨點角度：所有內圈鄰居方位的圓形平均
+      ms.forEach(n => {
+        let sx = 0, sy = 0;
+        n.adj.forEach(a => {
+          if (a.peer.hop >= n.hop) return;
+          const ang = Math.atan2(a.peer.y - scy, a.peer.x - scx);
+          sx += Math.cos(ang); sy += Math.sin(ang);
+        });
+        n._ang = (sx || sy) ? Math.atan2(sy, sx) : Math.random() * Math.PI*2;
+      });
+      ms.sort((a, b) => a._ang - b._ang);
+      // 平均分佈後，整圈旋轉到與錨點方位偏差最小的角度
+      const step = Math.PI*2 / ms.length;
+      let ox = 0, oy = 0;
+      ms.forEach((n, i) => { const d = n._ang - i*step; ox += Math.cos(d); oy += Math.sin(d); });
+      const off = Math.atan2(oy, ox);
+      ms.forEach((n, i) => { n._ang = off + i*step; });
+    }
+    ms.forEach(n => {
+      n.x = scx + Math.cos(n._ang) * R;
+      n.y = scy + Math.sin(n._ang) * R;
+    });
+  });
+  NODES.forEach(n => { n.vx = 0; n.vy = 0; delete n._ang; });
+}
+
+computeStarLayout();
+separateCircles();   // 保險：圓框仍重疊時互相推開
 storeOverview();
 NODES.forEach(n => { n.gx = n.x; n.gy = n.y; }); // 保存散狀布局位置供切換回星圖用
 
